@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_sound_lite/flutter_sound.dart';
+import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 part 'recordaudio_state.dart';
 
 class RecordAudioCubit extends Cubit<RecordaudioState> {
-  final FlutterSoundRecorder _myRecorder = FlutterSoundRecorder();
+  final AudioRecorder _myRecorder = AudioRecorder();
   final Function()? onRecordStart;
   final Function(String?) onRecordEnd;
   final Function()? onRecordCancel;
@@ -25,17 +25,21 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
     required this.onRecordCancel,
     required this.maxRecordLength,
   }) : super(RecordAudioReady()) {
-    _myRecorder.openAudioSession().then((value) {
-      _myRecorder.setSubscriptionDuration(const Duration(milliseconds: 200));
-      recorderStream = _myRecorder.onProgress!.listen((event) {
-        Duration current = event.duration;
-        currentDuration.value = current;
-        if (maxRecordLength != null) {
-          if (current.inMilliseconds >= maxRecordLength!.inMilliseconds) {
-            log('[chat_composer] 🔴 Audio passed max length');
-            stopRecord();
+    _myRecorder.hasPermission().then((value) {
+      // _myRecorder.setSubscriptionDuration(const Duration(milliseconds: 200));
+      _myRecorder
+          .startStream(const RecordConfig(encoder: AudioEncoder.aacEld))
+          .then((v) {
+        recorderStream = v.listen((event) {
+          Duration current = Duration(milliseconds: event.length);
+          currentDuration.value = current;
+          if (maxRecordLength != null) {
+            if (current.inMilliseconds >= maxRecordLength!.inMilliseconds) {
+              log('[chat_composer] 🔴 Audio passed max length');
+              stopRecord();
+            }
           }
-        }
+        });
       });
     });
   }
@@ -46,7 +50,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
 
   void startRecord() async {
     try {
-      _myRecorder.stopRecorder();
+      _myRecorder.stop();
     } catch (e) {
       //ignore
     }
@@ -66,10 +70,9 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
       Directory dir = await getApplicationDocumentsDirectory();
       String path = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.aac';
 
-      await _myRecorder.startRecorder(
-        toFile: path,
-        codec: Codec.aacADTS,
-      );
+      await _myRecorder.start(
+          const RecordConfig(encoder: AudioEncoder.aacEld), //aacADTS),
+          path: path);
 
       emit(RecordAudioStarted());
     } catch (e) {
@@ -80,7 +83,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   void stopRecord() async {
     // timer.cancel();
     try {
-      String? result = await _myRecorder.stopRecorder();
+      String? result = await _myRecorder.stop();
       if (result != null) {
         log('[chat_composer] 🟢 Audio path:  "$result');
         onRecordEnd(result);
@@ -93,7 +96,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
 
   void cancelRecord() async {
     try {
-      _myRecorder.stopRecorder();
+      _myRecorder.stop();
     } catch (ignore) {
       //ignore
     }
@@ -105,7 +108,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   @override
   Future<void> close() {
     try {
-      _myRecorder.closeAudioSession();
+      _myRecorder.dispose();
     } catch (e) {
       //ignore
     }
