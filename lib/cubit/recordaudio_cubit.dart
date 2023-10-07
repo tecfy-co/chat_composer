@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,36 +12,66 @@ part 'recordaudio_state.dart';
 
 class RecordAudioCubit extends Cubit<RecordaudioState> {
   final AudioRecorder _myRecorder = AudioRecorder();
+  final AudioEncoder encoder;
   final Function()? onRecordStart;
-  final Function(String?) onRecordEnd;
+  final Function(String?, Duration?) onRecordEnd;
   final Function()? onRecordCancel;
-  Duration? maxRecordLength;
-
+  final Duration maxRecordLength;
+  DateTime? recordStartTime;
+  late Timer timer;
   ValueNotifier<Duration?> currentDuration = ValueNotifier(Duration.zero);
-  late StreamSubscription? recorderStream;
+  // StreamSubscription? recorderStream;
 
-  RecordAudioCubit({
-    required this.onRecordEnd,
-    required this.onRecordStart,
-    required this.onRecordCancel,
-    required this.maxRecordLength,
-  }) : super(RecordAudioReady()) {
+  RecordAudioCubit(
+      {required this.onRecordEnd,
+      this.onRecordStart,
+      this.onRecordCancel,
+      required this.maxRecordLength,
+      required this.encoder})
+      : super(RecordAudioReady()) {
+    timer = Timer.periodic(const Duration(milliseconds: 500), (t) {
+      if (recordStartTime == null) return;
+      currentDuration.value = DateTime.now().difference(recordStartTime!);
+      if (currentDuration.value!.inMilliseconds >=
+          maxRecordLength.inMilliseconds) {
+        print('[chat_composer] 🔴 Audio passed max length');
+        stopRecord();
+      }
+    });
+
+    _myRecorder.onStateChanged().listen((event) {
+      if (event == RecordState.record) {
+        emit(RecordAudioStarted());
+      }
+      if (event == RecordState.stop) {
+        emit(RecordAudioReady());
+      }
+    });
+
     _myRecorder.hasPermission().then((value) {
+      print(value.toString());
       // _myRecorder.setSubscriptionDuration(const Duration(milliseconds: 200));
-      _myRecorder
-          .startStream(const RecordConfig(encoder: AudioEncoder.aacEld))
-          .then((v) {
-        recorderStream = v.listen((event) {
-          Duration current = Duration(milliseconds: event.length);
-          currentDuration.value = current;
-          if (maxRecordLength != null) {
-            if (current.inMilliseconds >= maxRecordLength!.inMilliseconds) {
-              log('[chat_composer] 🔴 Audio passed max length');
-              stopRecord();
-            }
-          }
-        });
-      });
+      // _myRecorder
+      //     .startStream(const RecordConfig(encoder: AudioEncoder.aacEld))
+      //     .then((v) {
+      //       print('++++++++++++++=== record started!!!++++++++');
+      //   v.listen((event) {
+      //     bytes.addAll(event);
+      //   });
+      //   // recorderStream = v.listen((event) {
+      //   //   Duration current = Duration(milliseconds: event.length);
+      //   //   currentDuration.value = current;
+      //   //   if (maxRecordLength != null) {
+      //   //     if (current.inMilliseconds >= maxRecordLength!.inMilliseconds) {
+      //   //       print('[chat_composer] 🔴 Audio passed max length');
+      //   //       stopRecord();
+      //   //     }
+      //   //   }
+      //   // });
+      // }).catchError((err){
+      //   print('ERRRRRRRRRRRRR');
+      //   print('$err');
+      // });
     });
   }
 
@@ -50,70 +81,77 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
 
   void startRecord() async {
     try {
-      _myRecorder.stop();
+      await _myRecorder.stop();
     } catch (e) {
       //ignore
     }
     currentDuration.value = Duration.zero;
     try {
-      bool hasStorage = await Permission.storage.isGranted;
-      bool hasMic = await Permission.microphone.isGranted;
+      if (!kIsWeb) {
+        bool hasStorage = await Permission.storage.isGranted;
+        bool hasMic = await Permission.microphone.isGranted;
 
-      if (!hasStorage || !hasMic) {
-        if (!hasStorage) await Permission.storage.request();
-        if (!hasMic) await Permission.microphone.request();
-        log('[chat_composer] 🔴 Denied permissions');
-        return;
+        if (!hasStorage || !hasMic) {
+          if (!hasStorage) await Permission.storage.request();
+          if (!hasMic) await Permission.microphone.request();
+          print('[chat_composer] 🔴 Denied permissions');
+          return;
+        }
       }
       if (onRecordStart != null) onRecordStart!();
 
-      Directory dir = await getApplicationDocumentsDirectory();
-      String path = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.aac';
+      String dir =
+          kIsWeb ? '' : (await getApplicationDocumentsDirectory()).path;
+      String path = dir.isEmpty
+          ? '${DateTime.now().millisecondsSinceEpoch}.aac'
+          : '$dir/${DateTime.now().millisecondsSinceEpoch}.aac';
 
-      await _myRecorder.start(
-          const RecordConfig(encoder: AudioEncoder.aacEld), //aacADTS),
-          path: path);
-
-      emit(RecordAudioStarted());
+      await _myRecorder.start(RecordConfig(encoder: encoder), path: path);
+      recordStartTime = DateTime.now();
     } catch (e) {
-      emit(RecordAudioReady());
+      print(e);
     }
   }
 
   void stopRecord() async {
-    // timer.cancel();
+    print('------------ Stop ----------------');
+    //await _myRecorder.stop();
     try {
       String? result = await _myRecorder.stop();
       if (result != null) {
-        log('[chat_composer] 🟢 Audio path:  "$result');
-        onRecordEnd(result);
+        print('[chat_composer] 🟢 Audio path:  "$result');
+        onRecordEnd(result, currentDuration.value);
+        recordStartTime = null;
       }
     } finally {
       currentDuration.value = Duration.zero;
     }
-    emit(RecordAudioReady());
+    // emit(RecordAudioReady());
   }
 
   void cancelRecord() async {
+    print('------------ Cancel ----------------');
     try {
-      _myRecorder.stop();
+      await _myRecorder.stop();
     } catch (ignore) {
       //ignore
     }
-    emit(RecordAudioReady());
+    // emit(RecordAudioReady());
     if (onRecordCancel != null) onRecordCancel!();
     currentDuration.value = Duration.zero;
+    recordStartTime = null;
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     try {
-      _myRecorder.dispose();
+      await _myRecorder.dispose();
     } catch (e) {
       //ignore
     }
-    if (recorderStream != null) recorderStream!.cancel();
+    // if (recorderStream != null) await recorderStream!.cancel();
     try {
+      timer.cancel();
       // _myRecorder = null;
       // timer.cancel();
     } catch (e) {

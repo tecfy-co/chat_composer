@@ -56,6 +56,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.17.2"
+  crypto:
+    dependency: transitive
+    description:
+      name: crypto
+      sha256: ff625774173754681d66daaf4a448684fb04b78f902da9cb3d308c19cc5e8bab
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -119,6 +127,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "8.2.2"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.7"
   lints:
     dependency: transitive
     description:
@@ -219,18 +235,18 @@ packages:
     dependency: transitive
     description:
       name: permission_handler
-      sha256: bc56bfe9d3f44c3c612d8d393bd9b174eb796d706759f9b495ac254e4294baa5
+      sha256: "284a66179cabdf942f838543e10413246f06424d960c92ba95c84439154fcac8"
       url: "https://pub.dev"
     source: hosted
-    version: "10.4.5"
+    version: "11.0.1"
   permission_handler_android:
     dependency: transitive
     description:
       name: permission_handler_android
-      sha256: "59c6322171c29df93a22d150ad95f3aa19ed86542eaec409ab2691b8f35f9a47"
+      sha256: ace7d15a3d1a4a0b91c041d01e5405df221edb9de9116525efc773c74e6fc790
       url: "https://pub.dev"
     source: hosted
-    version: "10.3.6"
+    version: "11.0.5"
   permission_handler_apple:
     dependency: transitive
     description:
@@ -279,6 +295,62 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.5"
+  record:
+    dependency: transitive
+    description:
+      name: record
+      sha256: "1737f663f5ec2b9036f319451c2345fe9103db732765cbd93c2bfe0c93709df6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0-beta.3+1"
+  record_android:
+    dependency: transitive
+    description:
+      name: record_android
+      sha256: "82bdcfadc8a79495c9be31a89b9ddbe027100f03585018bebeb40c6ef60c3b3e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-beta.2"
+  record_darwin:
+    dependency: transitive
+    description:
+      name: record_darwin
+      sha256: "69e0cd8bab262b6ae0ebba8a04369a2c4ac5947d41218ba73cf048ad64d87f8d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-beta.2+4"
+  record_linux:
+    dependency: transitive
+    description:
+      name: record_linux
+      sha256: "0202bc41f0b870321dd2080ac7b500743730e44887f4e0aff7837e144b81404b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
+  record_platform_interface:
+    dependency: transitive
+    description:
+      name: record_platform_interface
+      sha256: c5034d04fb2066dedac6d6b4352a8943dda0190bb50432311c53ae9b6a1901b7
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
+  record_web:
+    dependency: transitive
+    description:
+      name: record_web
+      sha256: "16902fa109ae6d13773eec93b827ee9a8381da9c92ef94eb6d6725aab3faa893"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-beta.2+4"
+  record_windows:
+    dependency: transitive
+    description:
+      name: record_windows
+      sha256: "9060f518f1c3f2314530e81a06362a7579421a775b09601369d8e8c2a7fd3a96"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-beta.2+1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -292,6 +364,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  sprintf:
+    dependency: transitive
+    description:
+      name: sprintf
+      sha256: "1fc9ffe69d4df602376b52949af107d8f5703b77cda567c4d7d86a0693120f23"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   stack_trace:
     dependency: transitive
     description:
@@ -332,6 +412,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  typed_data:
+    dependency: transitive
+    description:
+      name: typed_data
+      sha256: facc8d6582f16042dd49f2463ff1bd6e2c9ef9f3d5da3d9b087e244a7b564b3c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.3.2"
+  uuid:
+    dependency: transitive
+    description:
+      name: uuid
+      sha256: b715b8d3858b6fa9f68f87d20d98830283628014750c2b09b6f516c1da4af2a7
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   vector_math:
     dependency: transitive
     description:

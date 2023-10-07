@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:chat_composer/chat_composer.dart';
+import 'package:example/record.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -41,10 +44,23 @@ class _MyAppState extends State<MyApp> {
                   con.text = '';
                 });
               },
-              onRecordEnd: (path) {
+              onRecordEnd: (path, dur) {
                 setState(() {
-                  list.add('AUDIO PATH : ${path!}');
+                  list.add('AUDIO PATH : ${path!}  ${dur?.inMilliseconds}');
                 });
+                File(path!).length().then((value) {
+                  setState(() {
+                    list.add('Length : ${value}');
+                  });
+                }).catchError((err){
+                  print(err);
+                });
+              },
+              onRecordStart: () {
+                print('started');
+              },
+              onRecordCancel: () {
+                print('canceled');
               },
               textPadding: EdgeInsets.zero,
               leading: CupertinoButton(

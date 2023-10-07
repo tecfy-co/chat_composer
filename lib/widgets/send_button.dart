@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
+
 import '../consts/consts.dart';
 import '../cubit/recordaudio_cubit.dart';
 import '../utils/utils.dart';
@@ -110,13 +112,14 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
       builder: (_) {
         final GestureDetector handle = GestureDetector(
           onPanDown: (_) {
+            print('onPanDown');
             dragCanceled = false;
-            if (dragLocked.value &&
+            if ( //dragLocked.value &&
                 (context.read<RecordAudioCubit>().state
                     is RecordAudioStarted)) {
               context.read<RecordAudioCubit>().stopRecord();
               dragLocked.value = false;
-
+              print('Stop recording ++++++++++++++');
               return;
             }
             stopwatch.stop();
@@ -126,6 +129,7 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
             context.read<RecordAudioCubit>().startRecord();
           },
           onPanUpdate: (d) {
+            print('onPanUpdate');
             if (dragCanceled || dragLocked.value) return;
             DragAxis? axis = getAxis(d);
 
@@ -154,6 +158,7 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
             }
           },
           onPanEnd: (d) {
+            print('onPanEnd');
             if (dragLocked.value || dragCanceled) return;
 
             context.read<RecordAudioCubit>().stopRecord();
@@ -162,7 +167,9 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
             posValueListener.value = [_horizontalPos, _verticalPos];
           },
           onPanCancel: () {
+            print('onPanCancel');
             if (!dragCanceled) {
+              print('dragCanceled');
               if (stopwatch.elapsed.inMilliseconds > 300) {
                 context.read<RecordAudioCubit>().stopRecord();
               } else {
@@ -170,7 +177,9 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
                 if (widget.onPanCancel != null) {
                   widget.onPanCancel!();
                 } else {
-                  Fluttertoast.cancel();
+                  if (!kIsWeb) {
+                    Fluttertoast.cancel();
+                  }
                   Fluttertoast.showToast(
                       msg: "Hold to record",
                       toastLength: Toast.LENGTH_SHORT,

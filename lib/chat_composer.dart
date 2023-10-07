@@ -1,3 +1,5 @@
+import 'package:record/record.dart';
+
 import 'consts/consts.dart';
 import 'cubit/recordaudio_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,7 +21,10 @@ class ChatComposer extends StatefulWidget {
   final Function()? onRecordStart;
 
   /// A callback when end recording, return the recorder audio path.
-  final Function(String?) onRecordEnd;
+  final Function(String?, Duration?) onRecordEnd;
+
+  /// record encoder
+  final AudioEncoder audioEncoder;
 
   /// A callback when cancel recording.
   final Function()? onRecordCancel;
@@ -28,7 +33,7 @@ class ChatComposer extends StatefulWidget {
   final Function()? onPanCancel;
 
   /// Audio max duration should record then return recorder audio path.
-  final Duration? maxRecordLength;
+  final Duration maxRecordLength;
 
   /// focusNode
   final FocusNode? focusNode;
@@ -96,39 +101,40 @@ class ChatComposer extends StatefulWidget {
   /// recordIcon
   final IconData? recordIcon;
 
-  ChatComposer({
-    Key? key,
-    required this.onReceiveText,
-    required this.onRecordEnd,
-    this.onRecordStart,
-    this.onRecordCancel,
-    this.focusNode,
-    this.controller,
-    this.leading,
-    this.actions,
-    this.textCapitalization,
-    this.textInputAction,
-    this.keyboardType,
-    this.textStyle,
-    this.textFieldDecoration,
-    this.textPadding,
-    this.backgroundColor,
-    this.composerColor,
-    this.sendButtonColor,
-    this.sendButtonBackgroundColor,
-    this.lockColor,
-    this.lockBackgroundColor,
-    this.recordIconColor,
-    this.deleteButtonColor,
-    this.textColor,
-    this.padding,
-    this.sendIcon,
-    this.recordIcon,
-    this.borderRadius,
-    this.shadow,
-    this.maxRecordLength,
-    this.onPanCancel,
-  }) : super(key: key) {
+  ChatComposer(
+      {Key? key,
+      required this.onReceiveText,
+      required this.onRecordEnd,
+      this.onRecordStart,
+      this.onRecordCancel,
+      this.focusNode,
+      this.controller,
+      this.leading,
+      this.actions,
+      this.textCapitalization,
+      this.textInputAction,
+      this.keyboardType,
+      this.textStyle,
+      this.textFieldDecoration,
+      this.textPadding,
+      this.backgroundColor,
+      this.composerColor,
+      this.sendButtonColor,
+      this.sendButtonBackgroundColor,
+      this.lockColor,
+      this.lockBackgroundColor,
+      this.recordIconColor,
+      this.deleteButtonColor,
+      this.textColor,
+      this.padding,
+      this.sendIcon,
+      this.recordIcon,
+      this.borderRadius,
+      this.shadow,
+      this.maxRecordLength = const Duration(minutes: 1),
+      this.onPanCancel,
+      this.audioEncoder = AudioEncoder.pcm16bits})
+      : super(key: key) {
     localBackgroundColor = backgroundColor ?? localBackgroundColor;
     localComposerColor = composerColor ?? localComposerColor;
     localSendButtonColor = sendButtonColor ?? localSendButtonColor;
@@ -160,6 +166,7 @@ class _ChatComposerState extends State<ChatComposer>
         onRecordCancel: widget.onRecordCancel,
         onRecordStart: widget.onRecordStart,
         maxRecordLength: widget.maxRecordLength,
+        encoder: widget.audioEncoder,
       ),
       child: Container(
         color: localBackgroundColor,
