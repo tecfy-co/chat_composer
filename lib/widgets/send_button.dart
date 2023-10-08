@@ -112,7 +112,6 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
       builder: (_) {
         final GestureDetector handle = GestureDetector(
           onPanDown: (_) {
-            print('onPanDown');
             dragCanceled = false;
             if ( //dragLocked.value &&
                 (context.read<RecordAudioCubit>().state
@@ -129,7 +128,6 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
             context.read<RecordAudioCubit>().startRecord();
           },
           onPanUpdate: (d) {
-            print('onPanUpdate');
             if (dragCanceled || dragLocked.value) return;
             DragAxis? axis = getAxis(d);
 
@@ -158,7 +156,6 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
             }
           },
           onPanEnd: (d) {
-            print('onPanEnd');
             if (dragLocked.value || dragCanceled) return;
 
             context.read<RecordAudioCubit>().stopRecord();
@@ -167,9 +164,7 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
             posValueListener.value = [_horizontalPos, _verticalPos];
           },
           onPanCancel: () {
-            print('onPanCancel');
             if (!dragCanceled) {
-              print('dragCanceled');
               if (stopwatch.elapsed.inMilliseconds > 300) {
                 context.read<RecordAudioCubit>().stopRecord();
               } else {

@@ -44,17 +44,29 @@ class _MyAppState extends State<MyApp> {
                   con.text = '';
                 });
               },
-              onRecordEnd: (path, dur) {
-                setState(() {
-                  list.add('AUDIO PATH : ${path!}  ${dur?.inMilliseconds}');
-                });
-                File(path!).length().then((value) {
+              audioFile: false,
+              onRecordEnd: (path, bytes, dur) {
+                if (path != null) {
                   setState(() {
-                    list.add('Length : ${value}');
+                    list.add('AUDIO PATH : $path  ${dur?.inMilliseconds}');
                   });
-                }).catchError((err){
-                  print(err);
-                });
+                  File(path).length().then((value) {
+                    setState(() {
+                      list.add('Length : $value');
+                    });
+                  }).catchError((err) {
+                    print(err);
+                  });
+                } else if (bytes != null) {
+                  setState(() {
+                    list.add(
+                        'AUDIO byte length : ${bytes.length}  ${dur?.inMilliseconds}');
+                  });
+                } else {
+                  setState(() {
+                    list.add('No Audio!!!  ${dur?.inMilliseconds}');
+                  });
+                }
               },
               onRecordStart: () {
                 print('started');

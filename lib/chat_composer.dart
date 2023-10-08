@@ -21,10 +21,13 @@ class ChatComposer extends StatefulWidget {
   final Function()? onRecordStart;
 
   /// A callback when end recording, return the recorder audio path.
-  final Function(String?, Duration?) onRecordEnd;
+  final Function(String?, List<int>?, Duration?) onRecordEnd;
 
   /// record encoder
   final AudioEncoder audioEncoder;
+
+  /// record in file or stream
+  final bool audioFile;
 
   /// A callback when cancel recording.
   final Function()? onRecordCancel;
@@ -133,6 +136,7 @@ class ChatComposer extends StatefulWidget {
       this.shadow,
       this.maxRecordLength = const Duration(minutes: 1),
       this.onPanCancel,
+      this.audioFile = false,
       this.audioEncoder = AudioEncoder.pcm16bits})
       : super(key: key) {
     localBackgroundColor = backgroundColor ?? localBackgroundColor;
@@ -166,6 +170,7 @@ class _ChatComposerState extends State<ChatComposer>
         onRecordCancel: widget.onRecordCancel,
         onRecordStart: widget.onRecordStart,
         maxRecordLength: widget.maxRecordLength,
+        audioFile: widget.audioFile,
         encoder: widget.audioEncoder,
       ),
       child: Container(
