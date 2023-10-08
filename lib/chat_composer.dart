@@ -229,8 +229,10 @@ class _ChatComposerState extends State<ChatComposer>
 
   @override
   void dispose() {
-    localController.dispose();
-    if (widget.focusNode != null) widget.focusNode!.dispose();
+    if (widget.controller == null) {
+      localController.dispose();
+    }
+    // if (widget.focusNode != null) widget.focusNode!.dispose();
     super.dispose();
   }
 }

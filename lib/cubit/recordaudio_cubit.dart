@@ -92,9 +92,10 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
       if (audioFile) {
         String dir =
             kIsWeb ? '' : (await getApplicationDocumentsDirectory()).path;
+        String ext = encoder.name.contains('acc') ? 'acc' : encoder.name;
         String path = dir.isEmpty
-            ? '${DateTime.now().millisecondsSinceEpoch}.aac'
-            : '$dir/${DateTime.now().millisecondsSinceEpoch}.aac';
+            ? '${DateTime.now().millisecondsSinceEpoch}.$ext'
+            : '$dir/${DateTime.now().millisecondsSinceEpoch}.$ext';
         await _myRecorder.start(RecordConfig(encoder: encoder), path: path);
       } else {
         bytes.clear();
