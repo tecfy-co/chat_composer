@@ -29,6 +29,9 @@ class ChatComposer extends StatefulWidget {
   /// record in file or stream
   final bool audioFile;
 
+  /// disable Audio
+  final bool disableAudio;
+
   /// A callback when cancel recording.
   final Function()? onRecordCancel;
 
@@ -136,6 +139,7 @@ class ChatComposer extends StatefulWidget {
       this.shadow,
       this.maxRecordLength = const Duration(minutes: 1),
       this.onPanCancel,
+      this.disableAudio = false,
       this.audioFile = false,
       this.audioEncoder = AudioEncoder.pcm16bits})
       : super(key: key) {
@@ -166,6 +170,7 @@ class _ChatComposerState extends State<ChatComposer>
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => RecordAudioCubit(
+        disableAudio: widget.disableAudio,
         onRecordEnd: widget.onRecordEnd,
         onRecordCancel: widget.onRecordCancel,
         onRecordStart: widget.onRecordStart,

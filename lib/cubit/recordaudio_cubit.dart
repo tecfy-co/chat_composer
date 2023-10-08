@@ -21,6 +21,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   DateTime? recordStartTime;
   late Timer timer;
   final bool audioFile;
+  final bool disableAudio;
   ValueNotifier<Duration?> currentDuration = ValueNotifier(Duration.zero);
   // StreamSubscription? recorderStream;
   List<int> bytes = [];
@@ -30,9 +31,15 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
       this.onRecordStart,
       this.onRecordCancel,
       required this.audioFile,
+      required this.disableAudio,
       required this.maxRecordLength,
       required this.encoder})
       : super(RecordAudioReady()) {
+    if (disableAudio) {
+      emit(RecordAudioClosed());
+      return;
+    }
+
     timer = Timer.periodic(const Duration(milliseconds: 500), (t) {
       if (recordStartTime == null) return;
       currentDuration.value = DateTime.now().difference(recordStartTime!);
@@ -62,6 +69,8 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   }
 
   void startRecord() async {
+    if (disableAudio) return;
+
     try {
       await _myRecorder.stop();
     } catch (e) {
@@ -94,8 +103,9 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
             kIsWeb ? '' : (await getApplicationDocumentsDirectory()).path;
         String ext = encoder.name.contains('acc') ? 'acc' : encoder.name;
         String path = dir.isEmpty
-            ? '${DateTime.now().millisecondsSinceEpoch}.$ext'
-            : '$dir/${DateTime.now().millisecondsSinceEpoch}.$ext';
+            ? 'audio.$ext'
+            : '$dir${!kIsWeb && Platform.isWindows ? '\\' : '/'}audio.$ext';
+        print(path);
         await _myRecorder.start(RecordConfig(encoder: encoder), path: path);
       } else {
         bytes.clear();
@@ -113,6 +123,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   }
 
   void stopRecord() async {
+    if (disableAudio) return;
     print('------------ Stop ----------------');
     //await _myRecorder.stop();
     try {
@@ -133,6 +144,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   }
 
   void cancelRecord() async {
+    if (disableAudio) return;
     print('------------ Cancel ----------------');
     try {
       await _myRecorder.stop();
