@@ -13,7 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 enum DragAxis { horizontal, vertical }
 
 class SendButton extends StatefulWidget {
-  final Function(String?) onReceiveText;
+  final Future Function(String?) onReceiveText;
   final Function()? onPanCancel;
   final double composerHeight;
 
@@ -45,7 +45,7 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
   ValueNotifier<List<double>> posValueListener = ValueNotifier([1, 0]);
   double _horizontalPos = 1, _verticalPos = 0, lockPos = -25, cancelPos = 0.6;
   bool dragCanceled = false;
-
+  bool isSending = false;
   @override
   void initState() {
     super.initState();
@@ -371,19 +371,24 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
                       if (state is RecordAudioClosed)
                         Align(
                           alignment: const Alignment(1, 0),
-                          child: SendType(
-                            icon: localSendIcon,
-                            height: widget.composerHeight,
-                            onTap: () {
-                              String msg = localController.text.trim();
-                              if (msg.isNotEmpty) {
-                                log('[chat_composer] 🟢 text "$msg"');
-                                widget.onReceiveText(msg);
-                              } else {
-                                log('[chat_composer] 🔴 Text Empty');
-                              }
-                            },
-                          ),
+                          child: isSending
+                              ? const CircularProgressIndicator()
+                              : SendType(
+                                  icon: localSendIcon,
+                                  height: widget.composerHeight,
+                                  onTap: () async {
+                                    if (isSending) return;
+                                    String msg = localController.text.trim();
+                                    if (msg.isNotEmpty) {
+                                      log('[chat_composer] 🟢 text "$msg"');
+                                      setState(() => isSending = true);
+                                      await widget.onReceiveText(msg);
+                                      setState(() => isSending = false);
+                                    } else {
+                                      log('[chat_composer] 🔴 Text Empty');
+                                    }
+                                  },
+                                ),
                         )
                       else
                         Align(

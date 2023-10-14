@@ -15,7 +15,7 @@ class ChatComposer extends StatefulWidget {
   final List<Widget>? actions;
 
   /// A callback when submit Text Message.
-  final Function(String?) onReceiveText;
+  final Future Function(String?) onReceiveText;
 
   /// A callback when start recording.
   final Function()? onRecordStart;

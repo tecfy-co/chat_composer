@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
             ),
             ChatComposer(
               controller: con,
-              onReceiveText: (str) {
+              onReceiveText: (str) async {
                 setState(() {
                   list.add('TEXT : ${str!}');
                   con.text = '';
