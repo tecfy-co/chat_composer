@@ -107,6 +107,8 @@ class ChatComposer extends StatefulWidget {
   /// recordIcon
   final IconData? recordIcon;
 
+  final BuildContext? context;
+
   ChatComposer(
       {Key? key,
       required this.onReceiveText,
@@ -117,6 +119,7 @@ class ChatComposer extends StatefulWidget {
       this.controller,
       this.leading,
       this.actions,
+      this.context,
       this.textCapitalization,
       this.textInputAction,
       this.keyboardType,

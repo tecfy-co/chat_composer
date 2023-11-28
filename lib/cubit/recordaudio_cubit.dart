@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:record/record.dart';
@@ -22,6 +23,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
   late Timer timer;
   final bool audioFile;
   final bool disableAudio;
+  final BuildContext? context;
   ValueNotifier<Duration?> currentDuration = ValueNotifier(Duration.zero);
   // StreamSubscription? recorderStream;
   List<int> bytes = [];
@@ -30,6 +32,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
       {required this.onRecordEnd,
       this.onRecordStart,
       this.onRecordCancel,
+      this.context,
       required this.audioFile,
       required this.disableAudio,
       required this.maxRecordLength,
@@ -120,6 +123,14 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
 
       recordStartTime = DateTime.now();
     } catch (e) {
+      if (context != null) {
+        showDialog(
+            context: context!,
+            builder: (_) => CupertinoAlertDialog(
+                  title: Text("Failed"),
+                  content: Text(e.toString()),
+                ));
+      }
       Fluttertoast.showToast(msg: 'Cannot access microphone!');
       print(e);
     }
