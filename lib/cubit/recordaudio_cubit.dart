@@ -77,6 +77,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
     try {
       await _myRecorder.stop();
     } catch (e) {
+      print('====================5');
       //ignore
     }
 
@@ -123,6 +124,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
 
       recordStartTime = DateTime.now();
     } catch (e) {
+      print('====================4');
       if (context != null) {
         showDialog(
             context: context!,
@@ -163,6 +165,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
     try {
       await _myRecorder.stop();
     } catch (ignore) {
+      print('====================3');
       //ignore
     }
     // emit(RecordAudioReady());
@@ -176,6 +179,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
     try {
       await _myRecorder.dispose();
     } catch (e) {
+      print('====================2');
       //ignore
     }
     // if (recorderStream != null) await recorderStream!.cancel();
@@ -184,6 +188,7 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
       // _myRecorder = null;
       // timer.cancel();
     } catch (e) {
+      print('====================1');
       //ignore
     }
     return super.close();
