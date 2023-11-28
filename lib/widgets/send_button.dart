@@ -112,82 +112,98 @@ class _SendButtonState extends State<SendButton> with TickerProviderStateMixin {
       builder: (_) {
         final GestureDetector handle = GestureDetector(
           onPanDown: (_) {
-            dragCanceled = false;
-            if ( //dragLocked.value &&
-                (context.read<RecordAudioCubit>().state
-                    is RecordAudioStarted)) {
-              context.read<RecordAudioCubit>().stopRecord();
-              dragLocked.value = false;
-              print('Stop recording ++++++++++++++');
-              return;
-            }
-            stopwatch.stop();
-            stopwatch.reset();
-            stopwatch.start();
-            dragLocked.value = false;
-            context.read<RecordAudioCubit>().startRecord();
-          },
-          onPanUpdate: (d) {
-            if (dragCanceled || dragLocked.value) return;
-            DragAxis? axis = getAxis(d);
-
-            if (axis == DragAxis.vertical) {
-              posValueListener.value = [1, _verticalPos];
-              if (_verticalPos <= lockPos) {
-                dragLocked.value = true;
-                _verticalPos = 0;
-                _horizontalPos = 1;
-                posValueListener.value = [_horizontalPos, _verticalPos];
-              }
-            } else if (axis == DragAxis.horizontal) {
-              posValueListener.value = [_horizontalPos, 0];
-              if (_horizontalPos <= cancelPos) {
-                if (!dragCanceled) {
-                  dragCanceled = true;
-                  recordAnimation.reverse();
-                  _verticalPos = 0;
-                  _horizontalPos = 1;
-                  posValueListener.value = [_horizontalPos, _verticalPos];
-                  cancelRecord();
-                }
-              }
-            } else {
-              posValueListener.value = [1, 0];
-            }
-          },
-          onPanEnd: (d) {
-            if (dragLocked.value || dragCanceled) return;
-
-            context.read<RecordAudioCubit>().stopRecord();
-            _verticalPos = 0;
-            _horizontalPos = 1;
-            posValueListener.value = [_horizontalPos, _verticalPos];
-          },
-          onPanCancel: () {
-            if (!dragCanceled) {
-              if (stopwatch.elapsed.inMilliseconds > 300) {
+            try {
+              dragCanceled = false;
+              if ( //dragLocked.value &&
+                  (context.read<RecordAudioCubit>().state
+                      is RecordAudioStarted)) {
                 context.read<RecordAudioCubit>().stopRecord();
-              } else {
-                dragCanceled = true;
-                if (widget.onPanCancel != null) {
-                  widget.onPanCancel!();
-                } else {
-                  if (!kIsWeb) {
-                    Fluttertoast.cancel();
-                  }
-                  Fluttertoast.showToast(
-                      msg: "Hold to record",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.grey.withOpacity(0.8),
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                }
-                context.read<RecordAudioCubit>().cancelRecord();
+                dragLocked.value = false;
+                print('Stop recording ++++++++++++++');
+                return;
               }
               stopwatch.stop();
               stopwatch.reset();
+              stopwatch.start();
+              dragLocked.value = false;
+              context.read<RecordAudioCubit>().startRecord();
+            } catch (e) {
+              print('====================10');
+            }
+          },
+          onPanUpdate: (d) {
+            try {
+              if (dragCanceled || dragLocked.value) return;
+              DragAxis? axis = getAxis(d);
+
+              if (axis == DragAxis.vertical) {
+                posValueListener.value = [1, _verticalPos];
+                if (_verticalPos <= lockPos) {
+                  dragLocked.value = true;
+                  _verticalPos = 0;
+                  _horizontalPos = 1;
+                  posValueListener.value = [_horizontalPos, _verticalPos];
+                }
+              } else if (axis == DragAxis.horizontal) {
+                posValueListener.value = [_horizontalPos, 0];
+                if (_horizontalPos <= cancelPos) {
+                  if (!dragCanceled) {
+                    dragCanceled = true;
+                    recordAnimation.reverse();
+                    _verticalPos = 0;
+                    _horizontalPos = 1;
+                    posValueListener.value = [_horizontalPos, _verticalPos];
+                    cancelRecord();
+                  }
+                }
+              } else {
+                posValueListener.value = [1, 0];
+              }
+            } catch (e) {
+              print('====================11');
+            }
+          },
+          onPanEnd: (d) {
+            try {
+              if (dragLocked.value || dragCanceled) return;
+
+              context.read<RecordAudioCubit>().stopRecord();
+              _verticalPos = 0;
+              _horizontalPos = 1;
+              posValueListener.value = [_horizontalPos, _verticalPos];
+            } catch (e) {
+              print('====================12');
+            }
+          },
+          onPanCancel: () {
+            try {
+              if (!dragCanceled) {
+                if (stopwatch.elapsed.inMilliseconds > 300) {
+                  context.read<RecordAudioCubit>().stopRecord();
+                } else {
+                  dragCanceled = true;
+                  if (widget.onPanCancel != null) {
+                    widget.onPanCancel!();
+                  } else {
+                    if (!kIsWeb) {
+                      Fluttertoast.cancel();
+                    }
+                    Fluttertoast.showToast(
+                        msg: "Hold to record",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.grey.withOpacity(0.8),
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                  }
+                  context.read<RecordAudioCubit>().cancelRecord();
+                }
+                stopwatch.stop();
+                stopwatch.reset();
+              }
+            } catch (e) {
+              print('====================13');
             }
           },
           child: ValueListenableBuilder<double>(
