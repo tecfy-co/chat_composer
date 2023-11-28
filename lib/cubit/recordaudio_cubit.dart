@@ -106,10 +106,13 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
             ? 'audio.$ext'
             : '$dir${!kIsWeb && Platform.isWindows ? '\\' : '/'}audio.$ext';
         print(path);
-        await _myRecorder.start(RecordConfig(encoder: encoder), path: path);
+        await _myRecorder.start(
+            RecordConfig(encoder: encoder, sampleRate: 16000, numChannels: 1),
+            path: path);
       } else {
         bytes.clear();
-        (await _myRecorder.startStream(RecordConfig(encoder: encoder)))
+        (await _myRecorder.startStream(RecordConfig(
+                encoder: encoder, sampleRate: 16000, numChannels: 1)))
             .listen((event) {
           bytes.addAll(event);
         });
