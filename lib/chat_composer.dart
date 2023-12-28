@@ -9,6 +9,9 @@ import 'widgets/message_field.dart';
 import 'package:flutter/material.dart';
 import 'widgets/send_button.dart';
 
+export 'package:flutter_portal/flutter_portal.dart';
+export 'package:flutter_mentions/flutter_mentions.dart';
+
 class ChatComposer extends StatefulWidget {
   /// A widget to display before the [TextField].
   final Widget? leading;
