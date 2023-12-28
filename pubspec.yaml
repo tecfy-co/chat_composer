@@ -17,6 +17,10 @@ dependencies:
   permission_handler: ^11.0.1
   record: ^5.0.1
   plugin_platform_interface: ^2.1.2
+  flutter_mentions:
+    git:
+      url: https://github.com/mahmoudelgharabawi/flutter_mentions.git
+
 
 dev_dependencies:
   flutter_test:

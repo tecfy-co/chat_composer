@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp> {
                   }),
             ),
             ChatComposer(
+              focusNode: FocusNode(),
               controller: con,
               onReceiveText: (str) async {
                 setState(() {

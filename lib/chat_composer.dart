@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:record/record.dart';
 
 import 'consts/consts.dart';
@@ -42,7 +44,7 @@ class ChatComposer extends StatefulWidget {
   final Duration maxRecordLength;
 
   /// focusNode
-  final FocusNode? focusNode;
+  final FocusNode focusNode;
 
   /// controller
   final TextEditingController? controller;
@@ -109,15 +111,25 @@ class ChatComposer extends StatefulWidget {
 
   final BuildContext? context;
 
+  /// mention global Key
+  final GlobalKey<FlutterMentionsState>? mentionKey;
+
+  /// mentions List
+  final List<Mention>? mentions;
+
+  final double? suggestionListWidth;
+  final double? suggestionListHeight;
   ChatComposer(
       {Key? key,
       required this.onReceiveText,
       required this.onRecordEnd,
       this.onRecordStart,
       this.onRecordCancel,
-      this.focusNode,
+      required this.focusNode,
       this.controller,
       this.leading,
+      this.suggestionListHeight,
+      this.suggestionListWidth,
       this.actions,
       this.context,
       this.textCapitalization,
@@ -138,6 +150,8 @@ class ChatComposer extends StatefulWidget {
       this.padding,
       this.sendIcon,
       this.recordIcon,
+      this.mentionKey,
+      this.mentions,
       this.borderRadius,
       this.shadow,
       this.maxRecordLength = const Duration(minutes: 1),
@@ -145,7 +159,14 @@ class ChatComposer extends StatefulWidget {
       this.disableAudio = false,
       this.audioFile = false,
       this.audioEncoder = AudioEncoder.pcm16bits})
-      : super(key: key) {
+      : assert(
+            (mentionKey != null && mentions == null)
+                ? false
+                : (mentionKey == null && mentions != null)
+                    ? false
+                    : true,
+            'mentions and mentionKey should be defined with each other'),
+        super(key: key) {
     localBackgroundColor = backgroundColor ?? localBackgroundColor;
     localComposerColor = composerColor ?? localComposerColor;
     localSendButtonColor = sendButtonColor ?? localSendButtonColor;
@@ -200,18 +221,36 @@ class _ChatComposerState extends State<ChatComposer>
                             color: localComposerColor,
                             borderRadius: localborderRadius,
                             boxShadow: widget.shadow),
-                        child: MessageField(
-                          controller: localController,
-                          focusNode: widget.focusNode,
-                          keyboardType: widget.keyboardType,
-                          textCapitalization: widget.textCapitalization,
-                          textInputAction: widget.textInputAction,
-                          textPadding: widget.textPadding,
-                          textStyle: widget.textStyle,
-                          decoration: widget.textFieldDecoration,
-                          leading: widget.leading,
-                          actions: widget.actions,
-                        ),
+                        child: (widget.mentions != null &&
+                                widget.mentionKey != null)
+                            ? MessageFieldWithMention(
+                                suggestionListHeight:
+                                    widget.suggestionListHeight,
+                                suggestionListWidth: widget.suggestionListWidth,
+                                actions: widget.actions,
+                                mentions: widget.mentions,
+                                mentionKey: widget.mentionKey,
+                                focusNode: widget.focusNode,
+                                keyboardType: widget.keyboardType,
+                                textCapitalization: widget.textCapitalization,
+                                textInputAction: widget.textInputAction,
+                                textPadding: widget.textPadding,
+                                textStyle: widget.textStyle,
+                                textFieldDecoration: widget.textFieldDecoration,
+                                leading: widget.leading,
+                              )
+                            : MessageField(
+                                controller: localController,
+                                focusNode: widget.focusNode,
+                                keyboardType: widget.keyboardType,
+                                textCapitalization: widget.textCapitalization,
+                                textInputAction: widget.textInputAction,
+                                textPadding: widget.textPadding,
+                                textStyle: widget.textStyle,
+                                decoration: widget.textFieldDecoration,
+                                leading: widget.leading,
+                                actions: widget.actions,
+                              ),
                       ),
                     ),
                   ),
@@ -242,5 +281,131 @@ class _ChatComposerState extends State<ChatComposer>
     }
     // if (widget.focusNode != null) widget.focusNode!.dispose();
     super.dispose();
+  }
+}
+
+class MessageFieldWithMention extends StatefulWidget {
+  /// mention global Key
+  final GlobalKey<FlutterMentionsState>? mentionKey;
+
+  /// mentions List
+  final List<Mention>? mentions;
+
+  /// textPadding
+  final EdgeInsetsGeometry? textPadding;
+
+  /// textStyle
+  final TextStyle? textStyle;
+
+  /// focusNode
+  final FocusNode focusNode;
+
+  /// keyboardType
+  final TextInputType? keyboardType;
+
+  /// textCapitalization
+  final TextCapitalization? textCapitalization;
+
+  /// textInputAction
+  final TextInputAction? textInputAction;
+
+  /// textFieldDecoration
+  final InputDecoration? textFieldDecoration;
+
+  /// A widget to display before the [TextField].
+  final Widget? leading;
+
+  final List<Widget>? actions;
+
+  final double? suggestionListWidth;
+  final double? suggestionListHeight;
+
+  const MessageFieldWithMention({
+    super.key,
+    this.mentionKey,
+    this.textPadding,
+    this.textStyle,
+    required this.focusNode,
+    this.keyboardType,
+    this.textCapitalization,
+    this.textInputAction,
+    this.actions,
+    this.textFieldDecoration,
+    this.leading,
+    this.mentions,
+    this.suggestionListHeight,
+    this.suggestionListWidth,
+  });
+
+  @override
+  State<MessageFieldWithMention> createState() =>
+      _MessageFieldWithMentionState();
+}
+
+class _MessageFieldWithMentionState extends State<MessageFieldWithMention> {
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: composerHeight),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          if (widget.leading != null) widget.leading!,
+          Expanded(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxHeight: 160,
+              ),
+              child: Padding(
+                padding: widget.textPadding ??
+                    const EdgeInsets.symmetric(horizontal: 8),
+                child: FlutterMentions(
+                    suggestionListWidth: widget.suggestionListWidth ?? 300,
+                    suggestionListHeight: widget.suggestionListHeight ?? 300,
+                    scrollController: ScrollController(),
+                    suggestionListDecoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(15)),
+                    onChanged: (value) {
+                      context
+                          .read<RecordAudioCubit>()
+                          .toggleRecord(canRecord: value.isEmpty);
+
+                      localController.text = value;
+                    },
+                    style: widget.textStyle,
+                    focusNode: widget.focusNode,
+                    keyboardType: widget.keyboardType,
+                    textCapitalization:
+                        widget.textCapitalization ?? TextCapitalization.none,
+                    textInputAction: widget.textInputAction,
+                    decoration: widget.textFieldDecoration ??
+                        const InputDecoration(
+                            contentPadding: EdgeInsets.zero,
+                            border: InputBorder.none,
+                            hintText: 'Type your message...'),
+                    key: widget.mentionKey,
+                    suggestionPosition: SuggestionPosition.Top,
+                    maxLines: 50,
+                    minLines: 1,
+                    mentions: widget.mentions ?? []),
+              ),
+            ),
+          ),
+          if (widget.actions != null)
+            BlocBuilder<RecordAudioCubit, RecordaudioState>(
+              builder: (context, state) {
+                if (state is RecordAudioReady) {
+                  return Row(
+                    children: widget.actions!,
+                  );
+                }
+                return Container();
+              },
+            ),
+          const SizedBox(width: 4)
+        ],
+      ),
+    );
   }
 }
