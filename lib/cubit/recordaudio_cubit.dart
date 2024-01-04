@@ -75,9 +75,13 @@ class RecordAudioCubit extends Cubit<RecordaudioState> {
     if (disableAudio) return;
 
     try {
-      await _myRecorder.stop();
+      var result = await _myRecorder.isRecording();
+      if (result) {
+        await _myRecorder.stop();
+      }
     } catch (e) {
       print('====================5');
+      print('====================${e}');
       //ignore
     }
 
