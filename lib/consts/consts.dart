@@ -14,7 +14,7 @@ Color localTextColor = Colors.black;
 //Padding & Size
 EdgeInsetsGeometry localPadding = const EdgeInsets.all(8);
 BorderRadius localborderRadius = BorderRadius.circular(18);
-const double composerHeight = 58;
+const double composerHeight = 45;
 
 //Icons
 IconData localSendIcon = Icons.send_rounded;

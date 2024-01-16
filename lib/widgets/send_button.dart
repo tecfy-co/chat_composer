@@ -462,8 +462,8 @@ class SendType extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ?? () {},
       child: Container(
-        width: height - 8,
-        height: height - 8,
+        width: height - 7,
+        height: height - 7,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: localSendButtonBackgroundColor,
@@ -471,7 +471,7 @@ class SendType extends StatelessWidget {
         child: Icon(
           icon,
           color: localSendButtonColor,
-          size: 28,
+          // size: 28,
         ),
       ),
     );
