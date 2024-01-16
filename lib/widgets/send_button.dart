@@ -468,10 +468,12 @@ class SendType extends StatelessWidget {
           shape: BoxShape.circle,
           color: localSendButtonBackgroundColor,
         ),
-        child: Icon(
-          icon,
-          color: localSendButtonColor,
-          // size: 28,
+        child: Center(
+          child: Icon(
+            icon,
+            color: localSendButtonColor,
+            size: 20,
+          ),
         ),
       ),
     );
