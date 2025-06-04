@@ -227,6 +227,7 @@ class _ChatComposerState extends State<ChatComposer>
                         child: (widget.mentions != null &&
                                 widget.mentionKey != null)
                             ? MessageFieldWithMention(
+                                defaultText: localController.text,
                                 suggestionListHeight:
                                     widget.suggestionListHeight,
                                 suggestionListWidth: widget.suggestionListWidth,
@@ -323,6 +324,8 @@ class MessageFieldWithMention extends StatefulWidget {
   final double? suggestionListWidth;
   final double? suggestionListHeight;
 
+  final String? defaultText;
+
   const MessageFieldWithMention({
     super.key,
     this.mentionKey,
@@ -330,6 +333,7 @@ class MessageFieldWithMention extends StatefulWidget {
     this.textStyle,
     required this.focusNode,
     this.keyboardType,
+    this.defaultText,
     this.textCapitalization,
     this.textInputAction,
     this.actions,
@@ -363,6 +367,7 @@ class _MessageFieldWithMentionState extends State<MessageFieldWithMention> {
                 padding: widget.textPadding ??
                     const EdgeInsets.symmetric(horizontal: 8),
                 child: FlutterMentions(
+                    defaultText: widget.defaultText,
                     suggestionListWidth: widget.suggestionListWidth ?? 300,
                     suggestionListHeight: widget.suggestionListHeight ?? 300,
                     scrollController: ScrollController(),

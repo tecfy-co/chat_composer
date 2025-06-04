@@ -1,6 +1,6 @@
 name: chat_composer
 description: A Flutter package for easy implementation of chat composer allows users to chat with Text, Audio, and Other Media.
-version: 1.0.7
+version: 1.0.8
 homepage: https://github.com/anokabb/chat_composer
 
 environment:
@@ -20,7 +20,6 @@ dependencies:
   flutter_mentions:
     git:
       url: https://github.com/mahmoudelgharabawi/flutter_mentions.git
-
 
 dev_dependencies:
   flutter_test:
